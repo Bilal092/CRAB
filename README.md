@@ -1,4 +1,5 @@
 # CRAB
 
 
-My MATLAB Implementing CRAB type optimization for realization of Controlled-NOT Gate
+My MATLAB Implemention of CRAB type optimization for optimal control search for the realization of Quantum 
+Controlled-NOT Gate
