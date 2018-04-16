@@ -13,7 +13,7 @@ self. A = A;
 self. B = B;
 
 U= UT(A, B);
-Fbar  = 1 - 1/4 *abs((trace(self.Uf' * U)));
+Fbar  = 1 - 1/16 *abs((trace(self.Uf' * U)))^2;
 
 
 end

@@ -20,7 +20,7 @@ self.Ho = 0.1 * self.szz;
 
 self.num_har = 6;
 self.num_c =3;
-rng(1);
+rng(23);
 self.r  = rand(self.num_har,self.num_c);
 self.w  = 1 ;
 
@@ -31,8 +31,7 @@ self.tspan = linspace(self.ti, self. tf, self.steps);
 
 self.U0 = eye(4);
 self.UT = eye(4);
-self.U = [self.iter, 4 , 4];
-self.result = [];
+%self.U = [self.iter, 4 , 4];
 
 self.A = zeros(size(self.r));
 self.B = zeros(size(self.r));
@@ -41,24 +40,162 @@ self.Uf = exp(1i*pi*4) * [1 0 0 0;
                            0 0 0 1;
                            0 0 1 0];
                        
-self.X = rand(2*self.num_har,self.num_c);
-X = self.X(:);
-options = optimset('PlotFcns',@optimplotfval, 'MaxIter', 10000,'Display','iter');
-[x,fval,exitflag,output] = fminsearch(@Cost,X,options);
-
                        
-             
+% optimization variable dumping in                        
+self.iter = [];
+self.infidelity = [];
+self.searchdir = [];
+                       
+self.X = rand(2*self.num_har, self.num_c)-0.5;
+X = self.X(:);
+options = optimset('PlotFcns',@optimplotfval, 'MaxIter', 10000,...
+    'MaxFunEvals',10000,'Display','iter','OutputFcn',@outfun);
+[x,fval,exitflag,output] = fminsearch(@Cost,X,options);
+% options = optimset('MaxIter', 5000,...
+%     'MaxFunEvals',10000,'OutputFcn',@outfun);
+% [x,fval,exitflag,output] = fminsearch(@Cost,X,options);
+
+
+
+
+%%
+% egenration of graphs and stuff
+close all;
+width = 3.3;     % Width in inches
+height = 2.4;    % Height in inches
+alw = 0.5;    % AxesLineWidth
+fsz = 8;      % Fontsize
+fsz1=7;
+lw = 2;      % LineWidth
+msz = 6;       % MarkerSize
+[u1, u2 , u3]  = Controls();
+%%
+figure();
+
+subplot(3,1,1)
+plot(self.tspan, u1,'r','LineWidth',2)
+
+set(gca,'FontName','Times New Roman','FontSize',fsz,'FontWeight','normal')%'FontWeight','bold','LineWidth',1)
+pos = get(gcf, 'Position');
+set(gcf, 'Position', [pos(1) pos(2) width*100, height*100]); %<- Set size
+set(gca, 'FontSize', fsz, 'LineWidth', alw); %<- Set properties
+% set(gca,'YLim',[0 1]);
+% set(gca,'XLim',[0,1])
+% set(gca,'YTick',[1e-8 1e-7 1e-6 1e-5 1e-4 1e-3 1e-2 1e-1 1e0]);
+% title('(a)')
+%set(get(gca,'title'),'Position',[5.5 0.4 1.00011])
+
+% set(gca,'XTick',0:0.004:0.002);
+% xlabel('time (a.u.)');
+ylabel('$$\varepsilon_{1}$','Interpreter','latex')
+% set(gcf,'InvertHardcopy','on');
+% set(gcf,'PaperUnits', 'inches');
+% papersize = get(gcf, 'PaperSize');
+
+% left = (papersize(1)- width)/2;
+% bottom = (papersize(2)- height)/2;
+% myfiguresize = [left, bottom, width, height];
+% set(gcf,'PaperPosition', myfiguresize);
+% print('CRAB-Control1','-dpng','-r900');
+% print('CRAB-Control1','-depsc2','-r900');
+
+
+subplot(3,1,2);
+plot( self.tspan,u2,'g','LineWidth',2)
+
+
+set(gca,'FontName','Times New Roman','FontSize',fsz,'FontWeight','normal')%'FontWeight','bold','LineWidth',1)
+pos = get(gcf, 'Position');
+set(gcf, 'Position', [pos(1) pos(2) width*100, height*100]); %<- Set size
+set(gca, 'FontSize', fsz, 'LineWidth', alw); %<- Set properties
+% set(gca,'YLim',[0 1]);
+% set(gca,'XLim',[0,1])
+% set(gca,'YTick',[1e-8 1e-7 1e-6 1e-5 1e-4 1e-3 1e-2 1e-1 1e0]);
+% title('(a)')
+%set(get(gca,'title'),'Position',[5.5 0.4 1.00011])
+
+% set(gca,'XTick',0:0.004:0.002);
+% xlabel('time (a.u.)');
+ylabel('$$\varepsilon_{2}$','Interpreter','latex')
+% set(gcf,'InvertHardcopy','on');
+% set(gcf,'PaperUnits', 'inches');
+% papersize = get(gcf, 'PaperSize');
+% 
+% left = (papersize(1)- width)/2;
+% bottom = (papersize(2)- height)/2;
+% myfiguresize = [left, bottom, width, height];
+% set(gcf,'PaperPosition', myfiguresize);
+% print('CRAB-Control2','-dpng','-r900');
+% print('CRAB-Control2','-depsc2','-r900');
+
+
+subplot(3,1,3)
+plot(self.tspan, u3,'LineWidth',2)
+
+set(gca,'FontName','Times New Roman','FontSize',fsz,'FontWeight','normal')%'FontWeight','bold','LineWidth',1)
+pos = get(gcf, 'Position');
+set(gcf, 'Position', [pos(1) pos(2) width*100, height*100]); %<- Set size
+set(gca, 'FontSize', fsz, 'LineWidth', alw); %<- Set properties
+% set(gca,'YLim',[0 1]);
+% set(gca,'XLim',[0,1])
+% set(gca,'YTick',[1e-8 1e-7 1e-6 1e-5 1e-4 1e-3 1e-2 1e-1 1e0]);
+% title('(a)')
+%set(get(gca,'title'),'Position',[5.5 0.4 1.00011])
+
+% set(gca,'XTick',0:0.004:0.002);
+xlabel('time (a.u.)');
+ylabel('$$\varepsilon_{3}$','Interpreter','latex')
+set(gcf,'InvertHardcopy','on');
+set(gcf,'PaperUnits', 'inches');
+papersize = get(gcf, 'PaperSize');
+
+left = (papersize(1)- width)/2;
+bottom = (papersize(2)- height)/2;
+myfiguresize = [left, bottom, width, height];
+set(gcf,'PaperPosition', myfiguresize);
+print('CRAB-Controls','-dpng','-r900');
+print('CRAB-Controls','-depsc2','-r900');
 
 
 
 
 
+%%
+figure();
+iter = 1:length(self.infidelity);
+semilogy(iter , self.infidelity,'LineWidth',lw,'Color','k');
+set(gca,'FontName','Times New Roman','FontSize',fsz,'FontWeight','normal')%'FontWeight','bold','LineWidth',1)
+pos = get(gcf, 'Position');
+set(gcf, 'Position', [pos(1) pos(2) width*100, height*100]); %<- Set size
+set(gca, 'FontSize', fsz, 'LineWidth', alw); %<- Set properties
+% set(gca,'YLim',[0 1]);
+set(gca,'XLim',[-1,10000])
+% set(gca,'YTick',[1e-1 1e0]);
+% title('(a)')
+% set(gca,'YTick',[1e-1 1e0]);
+%set(get(gca,'title'),'Position',[5.5 0.4 1.00011])
+
+%set(gca,'YTick',0:0.004:0.002);
+xlabel('iterations');
+ylabel('Infidelity')
+set(gcf,'InvertHardcopy','on');
+set(gcf,'PaperUnits', 'inches');
+papersize = get(gcf, 'PaperSize');
+
+left = (papersize(1)- width)/2;
+bottom = (papersize(2)- height)/2;
+myfiguresize = [left, bottom, width, height];
+set(gcf,'PaperPosition', myfiguresize);
+print('CRAB-infidelity','-dpng','-r900');
+print('CRAB-infidelity','-depsc2','-r900');
 
 
-
-
-
-
+%%
+infidelity5 = self.infidelity;
+iter5 = iter;
+% saving data in matfile
+save('CRAB_NM5.mat','iter5');
+save('CRAB_NM5.mat' ,'infidelity5','-append')
 
 
 
